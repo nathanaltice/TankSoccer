@@ -25,19 +25,21 @@ class Soccer extends Phaser.Scene {
         this.p1 = this.physics.add.sprite(centerX, centerY + quarterFieldY, 'player01');
         this.p1.setCollideWorldBounds(true);
         this.p1.setDrag(this.playerDrag);
+        this.p1.hasBall = false;
 
         // add second player with physics
-        this.p2 = this.physics.add.sprite(centerX-32, centerY - quarterFieldY, 'player02');
+        this.p2 = this.physics.add.sprite(centerX, centerY - quarterFieldY, 'player02');
         this.p2.tint = 0xFACADE;
         this.p2.setAngle(180);
         this.p2.setCollideWorldBounds(true);
         this.p2.setDrag(this.playerDrag);
+        this.p2.hasBall = false;
 
         // add ball with physics ⚽️
         this.ball = this.physics.add.sprite(centerX, centerY, 'ball').setScale(0.5);
         this.ball.setCircle(this.ball.width / 2);   // set circle physics body
-        this.ball.setCollideWorldBounds(true);
-        this.ball.setBounce(0.75);
+        this.ball.setCollideWorldBounds(true, 0.75, 0.75);
+        //this.ball.setBounce(0.75);
         this.ball.setDrag(this.ballDrag);
 
         // add top net 🥅
@@ -50,9 +52,11 @@ class Soccer extends Phaser.Scene {
         let topNetLPost = this.physics.add.image(centerX - 72, 16); // top left post
         topNetLPost.setSize(16, 32);
         topNetLPost.setImmovable(true);
+        topNetLPost.setBounce(1);
         let topNetRPost = this.physics.add.image(centerX + 72, 16); // top right post
         topNetRPost.setSize(16, 32);
         topNetRPost.setImmovable(true);
+        topNetRPost.setBounce(1);
 
         // add bottom net 🥅
         let bottomNet = this.add.image(centerX, game.config.height, 'net').setOrigin(0.5, 1);
@@ -65,14 +69,29 @@ class Soccer extends Phaser.Scene {
         let bottomNetLPost = this.physics.add.image(centerX-72, game.config.height-16); // bottom left post
         bottomNetLPost.setSize(16, 32);
         bottomNetLPost.setImmovable(true);
+        bottomNetLPost.setBounce(1);
         let bottomNetRPost = this.physics.add.image(centerX+72, game.config.height-16); // bottom right post
         bottomNetRPost.setSize(16, 32);
         bottomNetRPost.setImmovable(true);
+        bottomNetRPost.setBounce(1);
 
         // add physics collider(s)
-        this.physics.add.collider(this.p1, this.p2);
+        // physics.add.collider(objectsA, objectsB, collideCallback, processCallback, callbackContext);
+        this.physics.add.collider(this.p1, this.p2,);
         this.physics.add.collider(this.p1, [topNetBack, topNetLPost, topNetRPost, bottomNetBack, bottomNetLPost, bottomNetRPost]);
-        this.physics.add.collider(this.ball, [this.p1, this.p2, topNetLPost, topNetRPost, bottomNetLPost, bottomNetRPost]);
+        // p1 <> ball
+        this.physics.add.collider(this.p1, this.ball, ()=>{
+            if(this.p1.body.touching.none == false) {
+                this.p1.hasBall = true;
+            }
+        }, null, this);
+        // p2 <> ball
+        this.physics.add.collider(this.p2, this.ball, ()=>{
+            if(this.p2.body.touching.none == false) {
+                this.p2.hasBall = true;
+            }
+        }, null, this);
+        this.physics.add.collider(this.ball, [topNetLPost, topNetRPost, bottomNetLPost, bottomNetRPost]);
         this.physics.add.collider(this.ball, [topNetBack, bottomNetBack], this.reset, null, this);
 
         // setup keyboard input ⌨️
@@ -98,8 +117,26 @@ class Soccer extends Phaser.Scene {
             this.p1.setVelocityY(0);
             this.p1.setAngle(90);
         }
+
+        // keep track of player possession
+        if(this.p1.body.touching.none == true) {
+            this.p1.hasBall = false;
+        }
+        if(this.p2.body.touching.none == true) {
+            this.p2.hasBall = false;
+        }
+
+        // spacebar to kick ball
+        if(Phaser.Input.Keyboard.JustDown(cursors.space) && this.p1.hasBall) {
+            if(this.ball.body.velocity.y > 0) {
+                this.ball.setVelocity(Phaser.Math.Between(-150, 150), 750);
+            } else if(this.ball.body.velocity.y < 0) {
+                this.ball.setVelocity(Phaser.Math.Between(-150, 150), -750);
+            }
+        }
     }
 
+    // reset field positions
     reset() {
         this.ball.setPosition(centerX, centerY);
         this.ball.setVelocity(0);
