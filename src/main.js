@@ -23,3 +23,5 @@ let centerX = game.config.width / 2;
 let centerY = game.config.height / 2;
 let quarterFieldX = game.config.width / 4;
 let quarterFieldY = game.config.height / 4;
+
+let cursors = null;
