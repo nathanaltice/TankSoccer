@@ -1,10 +1,16 @@
+// Nathan Altice
+// Tank Soccer
+// Updated: 4/26/20
+// Demonstrates Arcade Physics collision, colliders, compound bodies
+// Compound bodies example adapted from samme's example on code pen: https://codepen.io/samme/pen/ExYGRyo
+
 // game config
 let config = {
-    type: Phaser.AUTO,
+    type: Phaser.CANVAS,
     width: 400,
-    height: 800,
+    height: 700,
     physics: {
-        default: 'arcade',
+        default: "arcade",
         arcade: {
             debug: true,
             gravity: {
