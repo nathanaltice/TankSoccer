@@ -9,6 +9,9 @@ let config = {
     type: Phaser.CANVAS,
     width: 400,
     height: 700,
+    input: {
+        gamepad: true
+    },
     physics: {
         default: "arcade",
         arcade: {

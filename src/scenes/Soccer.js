@@ -17,6 +17,8 @@ class Soccer extends Phaser.Scene {
         this.playerVelocity = 275;
         this.playerDrag = 225;
         this.ballDrag = 10;
+        this.kickVelocity = 800;
+        this.kickDrift = 200;
 
         // set bg color to green
         this.cameras.main.setBackgroundColor("#33CC33");
@@ -28,7 +30,7 @@ class Soccer extends Phaser.Scene {
         this.p1.hasBall = false;
 
         // add second player with physics
-        this.p2 = this.physics.add.sprite(centerX, centerY - quarterFieldY, 'player02');
+        this.p2 = this.physics.add.sprite(centerX - quarterFieldX, centerY - quarterFieldY, 'player02');
         this.p2.tint = 0xFACADE;
         this.p2.setAngle(180);
         this.p2.setCollideWorldBounds(true);
@@ -38,8 +40,9 @@ class Soccer extends Phaser.Scene {
         // add ball with physics ⚽️
         this.ball = this.physics.add.sprite(centerX, centerY, 'ball').setScale(0.5);
         this.ball.setCircle(this.ball.width / 2);   // set circle physics body
+        // setCollideWorldBounds( [value] [, bounceX] [, bounceY])
         this.ball.setCollideWorldBounds(true, 0.75, 0.75);
-        //this.ball.setBounce(0.75);
+        this.ball.setBounce(0.1);
         this.ball.setDrag(this.ballDrag);
 
         // add top net 🥅
@@ -129,9 +132,9 @@ class Soccer extends Phaser.Scene {
         // spacebar to kick ball
         if(Phaser.Input.Keyboard.JustDown(cursors.space) && this.p1.hasBall) {
             if(this.ball.body.velocity.y > 0) {
-                this.ball.setVelocity(Phaser.Math.Between(-150, 150), 750);
+                this.ball.setVelocity(Phaser.Math.Between(-this.kickDrift, this.kickDrift), this.kickVelocity);
             } else if(this.ball.body.velocity.y < 0) {
-                this.ball.setVelocity(Phaser.Math.Between(-150, 150), -750);
+                this.ball.setVelocity(Phaser.Math.Between(-this.kickDrift, this.kickDrift), -this.kickVelocity);
             }
         }
     }
