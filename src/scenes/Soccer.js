@@ -18,7 +18,7 @@ class Soccer extends Phaser.Scene {
         this.playerDrag = 225;
         this.ballDrag = 10;
         this.kickVelocity = 800;
-        this.kickDrift = 200;
+        this.kickDrift = 400;
 
         // set bg color to green
         this.cameras.main.setBackgroundColor("#33CC33");
